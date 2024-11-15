@@ -1,11 +1,15 @@
 # Setup
-* run ```npm install```
+ * install dependencies
+```shell
+npm install
+```
 
 
 # Start server
-* run ```npm start```
+```shell
+npm start
+```
 
-Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 
