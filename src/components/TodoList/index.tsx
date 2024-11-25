@@ -6,6 +6,10 @@ type ListType = {
   name: string;
 };
 
+interface TimeoutMap {
+  [key: string]: NodeJS.Timeout;
+}
+
 const initialItems = [
   {
     type: "Fruit",
@@ -57,6 +61,28 @@ export default function TodoList() {
   const [itemsList, setItemsList] = useState(initialItems);
   const [fruitsList, setFruitsList] = useState<ListType[]>([]);
   const [vegetablesList, setVegetableList] = useState<ListType[]>([]);
+  const [timeouts, setTimeouts] = useState<TimeoutMap>({});
+
+  const setElementTimeout = (item: ListType, delay: number) => {
+    const key = item.name;
+    if (timeouts[key]) {
+      clearTimeout(timeouts[key]);
+    }
+
+    const timeoutId = setTimeout(() => {
+      if (item.type === "Fruit") {
+        setFruitsList((prev) => prev.filter((i) => i.name !== item.name));
+      } else {
+        setVegetableList((prev) => prev.filter((i) => i.name !== item.name));
+      }
+      setItemsList((prev) => [...prev, item]);
+    }, delay);
+
+    setTimeouts((prev) => ({
+      ...prev,
+      [key]: timeoutId,
+    }));
+  };
 
   const onClickItem = (item: ListType) => {
     if (item.type === "Fruit") {
@@ -66,10 +92,7 @@ export default function TodoList() {
     }
 
     setItemsList((prev) => prev.filter((i) => i.name !== item.name));
-
-    setTimeout(() => {
-      onRemoveItem(item);
-    }, 5000);
+    setElementTimeout(item, 5000);
   };
 
   const onRemoveItem = (item: ListType) => {
@@ -79,6 +102,9 @@ export default function TodoList() {
       setVegetableList((prev) => prev.filter((i) => i.name !== item.name));
     }
     setItemsList((prev) => [...prev, item]);
+    if (timeouts[item.name]) {
+      clearTimeout(timeouts[item.name]);
+    }
   };
 
   const renderItemsList = () => {
@@ -133,6 +159,7 @@ export default function TodoList() {
       </div>
     );
   };
+
   return (
     <div className={styles.container}>
       <div>{renderItemsList()}</div>
